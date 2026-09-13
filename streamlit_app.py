@@ -3,9 +3,7 @@ import time
 import base64
 from datetime import datetime
 
-# ---------------------------------------------------------------------------
-# Backend & Model Setup (Robust fallback for Linux / Windows / Python 3.10-3.14)
-# ---------------------------------------------------------------------------
+# Configure Keras backend
 os.environ.setdefault("KERAS_BACKEND", "numpy")
 
 import streamlit as st
@@ -13,7 +11,7 @@ import numpy as np
 from PIL import Image
 
 # ---------------------------------------------------------------------------
-# Streamlit Page Setup
+# Page Configuration
 # ---------------------------------------------------------------------------
 st.set_page_config(
     page_title="FreshSense — AI Food Freshness Detection",
@@ -23,470 +21,137 @@ st.set_page_config(
 )
 
 # ---------------------------------------------------------------------------
-# Helper: Read Logo as Base64 for bulletproof image rendering
+# Load and Embed Assets (Logo & CSS)
 # ---------------------------------------------------------------------------
-def get_logo_base64():
-    candidates = [
-        os.path.join(os.path.dirname(__file__), "static", "logo.jpg"),
-        os.path.join(os.path.dirname(__file__), "FreshSense", "static", "logo.jpg"),
-    ]
-    for p in candidates:
-        if os.path.exists(p):
-            try:
-                with open(p, "rb") as f:
-                    return base64.b64encode(f.read()).decode("utf-8")
-            except Exception:
-                pass
+def get_base64_image(image_path: str) -> str:
+    if os.path.exists(image_path):
+        try:
+            with open(image_path, "rb") as f:
+                return base64.b64encode(f.read()).decode("utf-8")
+        except Exception:
+            return ""
     return ""
 
-LOGO_B64 = get_logo_base64()
+# Candidate paths for logo
+logo_candidates = [
+    os.path.join(os.path.dirname(__file__), "static", "logo.jpg"),
+    os.path.join(os.path.dirname(__file__), "FreshSense", "static", "logo.jpg"),
+]
+logo_path = next((p for p in logo_candidates if os.path.exists(p)), "")
+LOGO_B64 = get_base64_image(logo_path)
 LOGO_SRC = f"data:image/jpeg;base64,{LOGO_B64}" if LOGO_B64 else ""
 
-# ---------------------------------------------------------------------------
-# High-End Design System Injection (Matching FreshSense Figma & Flask App)
-# ---------------------------------------------------------------------------
-st.markdown("""
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap');
+# Load EXACT style.css from FreshSense/static/css/style.css
+css_candidates = [
+    os.path.join(os.path.dirname(__file__), "FreshSense", "static", "css", "style.css"),
+    os.path.join(os.path.dirname(__file__), "static", "css", "style.css"),
+]
+css_path = next((p for p in css_candidates if os.path.exists(p)), "")
+ORIGINAL_CSS = ""
+if css_path and os.path.exists(css_path):
+    with open(css_path, "r", encoding="utf-8") as f:
+        ORIGINAL_CSS = f.read()
 
-    /* CSS Reset for Streamlit Container */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header[data-testid="stHeader"] {visibility: hidden; height: 0px;}
-    
-    .stApp {
-        background-color: #F8FAFC !important;
-        font-family: 'Work Sans', sans-serif !important;
-        color: #1E293B !important;
-    }
-    
-    .block-container {
-        padding-top: 0rem !important;
-        padding-bottom: 4rem !important;
-        max-width: 1200px !important;
-    }
-
-    /* Custom Header Bar */
-    .custom-navbar {
-        background: rgba(11, 15, 25, 0.96);
-        backdrop-filter: blur(14px);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        padding: 14px 28px;
-        margin: -1rem -2rem 24px -2rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-    }
-    
-    .nav-brand-group {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-    }
-    
-    .nav-logo {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-        object-fit: cover;
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
-    }
-    
-    .nav-title {
-        font-family: 'Outfit', sans-serif;
-        font-size: 22px;
-        font-weight: 800;
-        color: #FFFFFF;
-        letter-spacing: -0.02em;
-        margin: 0;
-        line-height: 1;
-    }
-    
-    .nav-sub {
-        font-size: 11px;
-        color: #94A3B8;
-        letter-spacing: 0.04em;
-        margin-top: 3px;
-    }
-    
-    .nav-badge {
-        background: linear-gradient(135deg, #10B981, #059669);
-        color: #FFFFFF;
-        font-size: 10px;
-        font-weight: 700;
-        padding: 4px 10px;
-        border-radius: 9999px;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-    }
-
-    /* Hero Section */
-    .hero-banner {
-        position: relative;
-        background: linear-gradient(145deg, #0B0F19 0%, #111827 50%, #0F172A 100%);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 20px;
-        padding: 42px 40px 36px 40px;
-        margin-bottom: 30px;
-        overflow: hidden;
-        box-shadow: 0 16px 40px rgba(15, 23, 42, 0.15);
-    }
-    
-    .hero-orb {
-        position: absolute;
-        border-radius: 50%;
-        filter: blur(70px);
-        pointer-events: none;
-        opacity: 0.25;
-    }
-    .orb-1 {
-        width: 320px;
-        height: 320px;
-        top: -80px;
-        right: -60px;
-        background: #10B981;
-    }
-    .orb-2 {
-        width: 260px;
-        height: 260px;
-        bottom: -60px;
-        left: 25%;
-        background: #3B82F6;
-    }
-    
-    .hero-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 6px 14px;
-        background: rgba(16, 185, 129, 0.12);
-        border: 1px solid rgba(16, 185, 129, 0.3);
-        border-radius: 9999px;
-        color: #34D399;
-        font-size: 12px;
-        font-weight: 600;
-        margin-bottom: 16px;
-    }
-    
-    .hero-pill-dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: #34D399;
-        box-shadow: 0 0 10px #34D399;
-    }
-    
-    .hero-h1 {
-        font-family: 'Outfit', sans-serif;
-        font-size: 38px;
-        font-weight: 800;
-        color: #FFFFFF;
-        line-height: 1.15;
-        letter-spacing: -0.03em;
-        margin-bottom: 12px;
-    }
-    
-    .hero-gradient {
-        background: linear-gradient(135deg, #34D399 0%, #6EE7B7 50%, #93C5FD 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-    
-    .hero-p {
-        color: #94A3B8;
-        font-size: 15px;
-        line-height: 1.6;
-        max-width: 680px;
-        margin-bottom: 26px;
-    }
-    
-    .stat-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 16px;
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
-        padding-top: 20px;
-    }
-    
-    .stat-card {
-        flex: 1;
-        min-width: 140px;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        border-radius: 12px;
-        padding: 12px 16px;
-    }
-    
-    .stat-val {
-        font-family: 'Outfit', sans-serif;
-        font-size: 24px;
-        font-weight: 800;
-        color: #F8FAFC;
-    }
-    
-    .stat-lbl {
-        font-size: 11px;
-        color: #94A3B8;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        font-weight: 600;
-        margin-top: 2px;
-    }
-
-    /* Workspace Containers */
-    .panel-card {
-        background: #FFFFFF;
-        border: 1px solid #E2E8F0;
-        border-radius: 16px;
-        padding: 24px;
-        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
-        margin-bottom: 24px;
-    }
-    
-    .panel-header {
-        font-family: 'Outfit', sans-serif;
-        font-size: 19px;
-        font-weight: 700;
-        color: #0F172A;
-        margin-bottom: 14px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    /* Diagnosis Badges */
-    .diag-badge {
-        padding: 18px 22px;
-        border-radius: 14px;
-        margin-bottom: 18px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-    }
-    
-    .badge-fresh {
-        background: #ECFDF5;
-        border: 1.5px solid #A7F3D0;
-        color: #065F46;
-    }
-    .badge-slightly-aged {
-        background: #FFFBEB;
-        border: 1.5px solid #FDE68A;
-        color: #92400E;
-    }
-    .badge-stale {
-        background: #FFF7ED;
-        border: 1.5px solid #FFEDD5;
-        color: #9A3412;
-    }
-    .badge-spoiled {
-        background: #FFF1F2;
-        border: 1.5px solid #FECDD3;
-        color: #991B1B;
-    }
-    .badge-rotten {
-        background: #FEF2F2;
-        border: 1.5px solid #FCA5A5;
-        color: #881337;
-    }
-    
-    .badge-label-small {
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        opacity: 0.8;
-    }
-    
-    .badge-class-name {
-        font-family: 'Outfit', sans-serif;
-        font-size: 26px;
-        font-weight: 800;
-        letter-spacing: -0.02em;
-        margin-top: 2px;
-    }
-    
-    .badge-conf-val {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 20px;
-        font-weight: 700;
-        background: rgba(255, 255, 255, 0.8);
-        padding: 6px 14px;
-        border-radius: 9999px;
-        border: 1px solid rgba(0, 0, 0, 0.05);
-    }
-    
-    .guidance-box {
-        background: #F8FAFC;
-        border-left: 4px solid #10B981;
-        border-radius: 0 10px 10px 0;
-        padding: 14px 18px;
-        font-size: 14px;
-        line-height: 1.6;
-        color: #334155;
-        margin-bottom: 20px;
-    }
-    
-    .empty-state-box {
-        text-align: center;
-        padding: 44px 20px;
-        background: #F8FAFC;
-        border: 2px dashed #CBD5E1;
-        border-radius: 16px;
-        color: #64748B;
-    }
-
-    /* Bento Taxonomy Grid */
-    .bento-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-        gap: 16px;
-        margin-bottom: 32px;
-    }
-    
-    .bento-card {
-        background: #FFFFFF;
-        border-radius: 14px;
-        padding: 18px;
-        border: 1px solid #E2E8F0;
-        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
-    }
-    
-    .bento-header {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 10px;
-    }
-    
-    .bento-title {
-        font-family: 'Outfit', sans-serif;
-        font-size: 16px;
-        font-weight: 700;
-    }
-    
-    .bento-desc {
-        font-size: 13px;
-        color: #64748B;
-        line-height: 1.5;
-    }
-
-    /* Custom Streamlit Button Styling */
-    div.stButton > button {
-        background: linear-gradient(135deg, #10B981, #059669) !important;
-        color: #FFFFFF !important;
-        font-family: 'Outfit', sans-serif !important;
-        font-weight: 700 !important;
-        font-size: 16px !important;
-        border: none !important;
-        border-radius: 10px !important;
-        padding: 12px 24px !important;
-        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35) !important;
-        transition: all 0.2s ease !important;
-        width: 100% !important;
-    }
-    div.stButton > button:hover {
-        transform: translateY(-1px) !important;
-        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45) !important;
-    }
-</style>
-""", unsafe_allow_html=True)
+# Replace any /static/logo.jpg in the CSS or HTML with base64 data
+if LOGO_SRC:
+    ORIGINAL_CSS = ORIGINAL_CSS.replace("/static/logo.jpg", LOGO_SRC)
 
 # ---------------------------------------------------------------------------
-# Navbar Component
+# Streamlit Specific CSS Integration
 # ---------------------------------------------------------------------------
-logo_html = f'<img src="{LOGO_SRC}" class="nav-logo" alt="Logo">' if LOGO_SRC else '<span style="font-size:26px;">🍃</span>'
+STREAMLIT_INTEGRATION_CSS = """
+/* Streamlit UI Reset to make custom HTML look 100% native */
+#MainMenu {visibility: hidden !important;}
+footer {visibility: hidden !important;}
+header[data-testid="stHeader"] {visibility: hidden !important; height: 0px !important;}
 
-st.markdown(f"""
-<div class="custom-navbar">
-    <div class="nav-brand-group">
-        {logo_html}
-        <div>
-            <div class="nav-title">FreshSense</div>
-            <div class="nav-sub">AI FOOD FRESHNESS DIAGNOSTIC PLATFORM</div>
-        </div>
-    </div>
-    <div style="display:flex; align-items:center; gap:12px;">
-        <span class="nav-badge">AI 2.0</span>
-        <span style="color:#94A3B8; font-size:12px; font-weight:600;">Pak-Angels Mid Program Hackathon</span>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+.stApp {
+    background-color: #F8FAFC !important;
+    font-family: 'Work Sans', sans-serif !important;
+    color: #475569 !important;
+}
+
+.block-container {
+    padding: 0 !important;
+    max-width: 100% !important;
+}
+
+/* Ensure container max-width matches the original navbar and hero */
+.container {
+    max-width: 1160px !important;
+    margin: 0 auto !important;
+    padding: 0 28px !important;
+}
+
+/* File Uploader styling to blend with the original dropzone */
+[data-testid="stFileUploader"] {
+    margin-top: 10px !important;
+    margin-bottom: 12px !important;
+}
+
+[data-testid="stFileUploaderDropzone"] {
+    background: #FAFAFC !important;
+    border: 2px dashed #CBD5E1 !important;
+    border-radius: 14px !important;
+    padding: 24px 16px !important;
+    transition: all 0.25s ease !important;
+}
+
+[data-testid="stFileUploaderDropzone"]:hover {
+    border-color: #059669 !important;
+    background: #F0FDF4 !important;
+}
+
+/* Sample chip buttons */
+.stButton > button {
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    color: #334155 !important;
+    font-family: 'Work Sans', sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+    transition: all 0.2s ease !important;
+    width: 100% !important;
+}
+
+.stButton > button:hover {
+    border-color: #10B981 !important;
+    color: #059669 !important;
+    background: #ECFDF5 !important;
+    transform: translateY(-1px) !important;
+}
+"""
+
+st.markdown(f"<style>{ORIGINAL_CSS}\n{STREAMLIT_INTEGRATION_CSS}</style>", unsafe_allow_html=True)
 
 # ---------------------------------------------------------------------------
-# Hero Banner Component
-# ---------------------------------------------------------------------------
-st.markdown("""
-<div class="hero-banner">
-    <div class="hero-orb orb-1"></div>
-    <div class="hero-orb orb-2"></div>
-    <div class="hero-pill">
-        <span class="hero-pill-dot"></span>
-        Deep Learning Vision System &bull; 82% F1 Accuracy &bull; Pak-Angels Hackathon
-    </div>
-    <div class="hero-h1">
-        Know your food freshness.<br>
-        <span class="hero-gradient">Before you taste or serve.</span>
-    </div>
-    <div class="hero-p">
-        Instant computer vision diagnostics powered by MobileNetV2. Upload any fruit or vegetable photo to evaluate quality across five distinct biological degradation stages with automated culinary guidance.
-    </div>
-    <div class="stat-row">
-        <div class="stat-card">
-            <div class="stat-val">82%</div>
-            <div class="stat-lbl">Validation F1 Score</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-val">13</div>
-            <div class="stat-lbl">Produce Categories</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-val">5 Stages</div>
-            <div class="stat-lbl">Freshness Spectrum</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-val">&lt; 350ms</div>
-            <div class="stat-lbl">Local CPU Latency</div>
-        </div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-# ---------------------------------------------------------------------------
-# Model Loader (Resilient Fallback: TF / Keras 3 with compile=False)
+# Neural Network Model Loader (MobileNetV2)
 # ---------------------------------------------------------------------------
 IMG_HEIGHT = 128
 IMG_WIDTH = 128
 CLASS_NAMES = ["Fresh", "Slightly Aged", "Stale", "Spoiled", "Rotten"]
 
 CLASS_DESCRIPTIONS = {
-    "Fresh": "Harvest-grade quality with firm cellular structure and prime pigmentation. Completely safe for raw consumption, salads, or extended cold storage.",
-    "Slightly Aged": "Minor dehydration or light oxidation detected. Organoleptic quality remains safe; recommended for consumption within 24–48 hours.",
-    "Stale": "Noticeable moisture loss, skin wrinkling, and aroma decline. Safe to cook, stew, bake, or puree, but not recommended for fresh raw eating.",
-    "Spoiled": "Onset of active microbial breakdown and deep tissue softening. Unfit for human consumption — discard immediately to prevent contamination.",
-    "Rotten": "Severe decomposition and heavy fungal / spore coverage. Pungent biological decay. Hazardous bio-waste — dispose in compost or sealed trash.",
+    "Fresh": "This item looks fresh and safe to consume. No visible signs of aging or spoilage.",
+    "Slightly Aged": "Minor signs of aging detected. Still safe for consumption but best used soon.",
+    "Stale": "Noticeable aging present. Quality has declined — consume with caution.",
+    "Spoiled": "Significant spoilage detected. This item is not recommended for consumption.",
+    "Rotten": "Severe decay detected. This item should be discarded immediately.",
 }
 
-CLASS_BADGE_MAP = {
-    "Fresh": "badge-fresh",
-    "Slightly Aged": "badge-slightly-aged",
-    "Stale": "badge-stale",
-    "Spoiled": "badge-spoiled",
-    "Rotten": "badge-rotten",
-}
-
-CLASS_BAR_COLORS = {
-    "Fresh": "#10B981",
-    "Slightly Aged": "#F59E0B",
-    "Stale": "#F97316",
-    "Spoiled": "#EF4444",
-    "Rotten": "#9333EA",
+CLASS_KEYS = {
+    "Fresh": "fresh",
+    "Slightly Aged": "slightly-aged",
+    "Stale": "stale",
+    "Spoiled": "spoiled",
+    "Rotten": "rotten"
 }
 
 @st.cache_resource(show_spinner=False)
-def load_food_model():
+def load_mobilenet():
     candidate_paths = [
         os.path.join(os.path.dirname(__file__), "models", "MobileNetV2_best_model.keras"),
         os.path.join(os.path.dirname(__file__), "FreshSense", "models", "MobileNetV2_best_model.keras"),
@@ -498,281 +163,492 @@ def load_food_model():
             "MobileNetV2_best_model.keras",
         ),
     ]
-    model_path = next((p for p in candidate_paths if os.path.exists(p)), None)
-    if not model_path:
-        raise FileNotFoundError(f"Model file not found in paths: {candidate_paths}")
+    path = next((p for p in candidate_paths if os.path.exists(p)), None)
+    if not path:
+        raise FileNotFoundError("MobileNetV2_best_model.keras not found.")
 
-    # Try TensorFlow first (if on Streamlit Cloud Python 3.10/3.11 Linux)
     try:
         import tensorflow as tf
-        return tf.keras.models.load_model(model_path, compile=False)
+        return tf.keras.models.load_model(path, compile=False)
     except Exception:
-        # Fallback to Keras 3 with numpy backend (Windows Python 3.14 or light environments)
         os.environ.setdefault("KERAS_BACKEND", "numpy")
         import keras
-        return keras.saving.load_model(model_path, compile=False)
+        return keras.saving.load_model(path, compile=False)
 
 try:
-    model = load_food_model()
+    model = load_mobilenet()
 except Exception as e:
-    st.error(f"⚠️ Model initialization warning: {e}")
     model = None
 
-def preprocess_image(image: Image.Image) -> np.ndarray:
-    image = image.convert("RGB").resize((IMG_WIDTH, IMG_HEIGHT))
-    img_array = np.array(image, dtype=np.float32) / 255.0
-    return np.expand_dims(img_array, axis=0)
+def preprocess(img: Image.Image) -> np.ndarray:
+    img = img.convert("RGB").resize((IMG_WIDTH, IMG_HEIGHT))
+    arr = np.array(img, dtype=np.float32) / 255.0
+    return np.expand_dims(arr, axis=0)
 
 # ---------------------------------------------------------------------------
-# Main Interactive Diagnostic Workspace
+# Top Navigation (EXACT from index.html)
 # ---------------------------------------------------------------------------
-st.markdown("### 🔬 AI Diagnostic Workspace")
-st.caption("Upload a fruit/vegetable photo or click a sample to run real-time MobileNetV2 freshness evaluation.")
+nav_logo_html = f'<img src="{LOGO_SRC}" alt="FreshSense Logo" class="nav-logo-img">' if LOGO_SRC else '<span style="font-size:24px;">🍃</span>'
 
-col_input, col_output = st.columns([1, 1.15], gap="large")
-
-# Persistent selection in session_state
-if "current_image" not in st.session_state:
-    st.session_state["current_image"] = None
-if "current_image_name" not in st.session_state:
-    st.session_state["current_image_name"] = ""
-if "history" not in st.session_state:
-    st.session_state["history"] = []
-
-with col_input:
-    st.markdown("""
-    <div class="panel-card">
-        <div class="panel-header">
-            <span>📷</span> Produce Image Input
-        </div>
-    """, unsafe_allow_html=True)
-
-    uploaded_file = st.file_uploader(
-        "Drop produce photo here (JPG, JPEG, PNG, WebP):",
-        type=["jpg", "jpeg", "png", "webp"],
-        key="uploader",
-        help="Upload a clear produce image for biological decay evaluation"
-    )
-
-    if uploaded_file is not None:
-        try:
-            st.session_state["current_image"] = Image.open(uploaded_file)
-            st.session_state["current_image_name"] = uploaded_file.name
-        except Exception as e:
-            st.error(f"Could not read uploaded image: {e}")
-
-    # Instant Produce Sample Chips
-    st.markdown("<p style='font-size:13px; font-weight:600; color:#64748B; margin:14px 0 6px 0;'>Or select a test sample:</p>", unsafe_allow_html=True)
-    
-    test_samples_dir = os.path.join(os.path.dirname(__file__), "Test Samples")
-    sample_options = [
-        ("Fresh Okra", "fresh ocra.jpg"),
-        ("Fresh Mango", "FreshMango_40.png"),
-        ("Rotten Apple", "820_RottenApple_71.jpg"),
-        ("Rotten Banana", "251_RottenBanana_99.png"),
-        ("Fresh Strawberry", "723_FreshStrawberry_74.jpg"),
-        ("Rotten Capsicum", "403_RottenCapsicum_86.jpg"),
-    ]
-    
-    chip_cols = st.columns(3)
-    for idx, (label, fname) in enumerate(sample_options):
-        c_idx = idx % 3
-        with chip_cols[c_idx]:
-            if st.button(label, key=f"chip_{fname}"):
-                sample_file = os.path.join(test_samples_dir, fname)
-                if os.path.exists(sample_file):
-                    st.session_state["current_image"] = Image.open(sample_file)
-                    st.session_state["current_image_name"] = label
-
-    # Image Preview
-    if st.session_state["current_image"] is not None:
-        st.markdown("<div style='margin-top:16px;'>", unsafe_allow_html=True)
-        st.image(
-            st.session_state["current_image"],
-            caption=f"Selected: {st.session_state['current_image_name']}",
-            use_container_width=True
-        )
-        st.markdown("</div>", unsafe_allow_html=True)
-        
-        # Reset Button
-        if st.button("🔄 Clear / Select Another Image", key="clear_btn"):
-            st.session_state["current_image"] = None
-            st.session_state["current_image_name"] = ""
-            st.rerun()
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-with col_output:
-    st.markdown("""
-    <div class="panel-card">
-        <div class="panel-header">
-            <span>🧠</span> Diagnostic Results & Quality Assessment
-        </div>
-    """, unsafe_allow_html=True)
-
-    if st.session_state["current_image"] is None:
-        st.markdown("""
-        <div class="empty-state-box">
-            <div style="font-size: 38px; margin-bottom: 8px;">🥑</div>
-            <div style="font-family:'Outfit', sans-serif; font-size:18px; font-weight:700; color:#1E293B;">Awaiting Produce Photo</div>
-            <p style="font-size:13px; max-width:320px; margin:8px auto 0 auto; line-height:1.5;">
-                Upload a photo on the left or select a sample produce button to run the MobileNetV2 neural network diagnostic.
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-    else:
-        # Run inference
-        if model is None:
-            st.error("Model is not loaded. Please verify model weights.")
-        else:
-            with st.spinner("Evaluating cellular decay & pigmentation..."):
-                t_start = time.time()
-                input_tensor = preprocess_image(st.session_state["current_image"])
-                preds = model.predict(input_tensor, verbose=0)
-                latency_ms = (time.time() - t_start) * 1000
-
-                probs = [float(p) for p in preds[0]]
-                pred_idx = int(np.argmax(probs))
-                pred_class = CLASS_NAMES[pred_idx]
-                confidence = probs[pred_idx] * 100.0
-
-            # Status Badge
-            badge_class = CLASS_BADGE_MAP.get(pred_class, "badge-fresh")
-            st.markdown(f"""
-            <div class="diag-badge {badge_class}">
-                <div>
-                    <div class="badge-label-small">AI Freshness Classification</div>
-                    <div class="badge-class-name">{pred_class}</div>
-                </div>
-                <div class="badge-conf-val">{confidence:.1f}%</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-            # Culinary Guidance
-            st.markdown(f"""
-            <div class="guidance-box">
-                <b style="color:#0F172A;">Culinary & Handling Advice:</b><br>
-                {CLASS_DESCRIPTIONS[pred_class]}
-            </div>
-            """, unsafe_allow_html=True)
-
-            # Probability Bars
-            st.markdown("<p style='font-family:Outfit, sans-serif; font-size:15px; font-weight:700; margin-bottom:10px;'>📊 Stage Confidence Breakdown</p>", unsafe_allow_html=True)
-            for name, prob in zip(CLASS_NAMES, probs):
-                pct = prob * 100.0
-                bar_color = CLASS_BAR_COLORS.get(name, "#10B981")
-                st.markdown(f"""
-                <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:600; margin-bottom:3px;">
-                    <span>{name}</span>
-                    <span style="font-family:'JetBrains Mono', monospace;">{pct:.1f}%</span>
-                </div>
-                <div style="background:#F1F5F9; border-radius:9999px; height:8px; width:100%; margin-bottom:10px; overflow:hidden;">
-                    <div style="background:{bar_color}; width:{pct}%; height:100%; border-radius:9999px;"></div>
-                </div>
-                """, unsafe_allow_html=True)
-
-            st.caption(f"⚡ Latency: `{latency_ms:.1f}ms` &bull; Input: `128×128 RGB` &bull; Weights: `MobileNetV2 (11.5 MB)`")
-
-            # Add to session history
-            now_str = datetime.now().strftime("%I:%M:%S %p")
-            item_record = {
-                "Item": st.session_state["current_image_name"],
-                "Result": pred_class,
-                "Confidence": f"{confidence:.1f}%",
-                "Time": now_str,
-            }
-            if not st.session_state["history"] or st.session_state["history"][0]["Time"] != now_str:
-                st.session_state["history"].insert(0, item_record)
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# ---------------------------------------------------------------------------
-# 5-Stage Biological Quality Spectrum (Bento Grid)
-# ---------------------------------------------------------------------------
-st.markdown("<br><hr style='border:none; border-top:1px solid #E2E8F0; margin:24px 0;'><br>", unsafe_allow_html=True)
-st.markdown("### 📋 5-Stage Quality Spectrum")
-st.caption("Standardized biological taxonomy used by FreshSense to grade produce deterioration.")
-
-st.markdown("""
-<div class="bento-grid">
-    <div class="bento-card" style="border-top: 3px solid #10B981;">
-        <div class="bento-header">
-            <span style="font-size:20px;">🟢</span>
-            <span class="bento-title" style="color:#065F46;">Fresh</span>
-        </div>
-        <div class="bento-desc">Peak firmness, bright natural pigmentation, no microbial or oxidation activity. Ideal for raw eating.</div>
+st.markdown(f"""
+<header class="navbar">
+    <div class="container nav-inner">
+        <a href="/" class="nav-brand">
+            {nav_logo_html}
+            <span class="brand-title">FreshSense</span>
+            <span class="brand-badge">AI 2.0</span>
+        </a>
+        <nav class="nav-links">
+            <a href="#detect">Detect Freshness</a>
+            <a href="#scale">Quality Scale</a>
+            <a href="#about">Architecture</a>
+            <a href="#history">Scan History</a>
+        </nav>
     </div>
-    <div class="bento-card" style="border-top: 3px solid #F59E0B;">
-        <div class="bento-header">
-            <span style="font-size:20px;">🟡</span>
-            <span class="bento-title" style="color:#92400E;">Slightly Aged</span>
-        </div>
-        <div class="bento-desc">Minor surface dulling or slight moisture loss. Fully safe; recommend preparing within 48 hours.</div>
-    </div>
-    <div class="bento-card" style="border-top: 3px solid #F97316;">
-        <div class="bento-header">
-            <span style="font-size:20px;">🟠</span>
-            <span class="bento-title" style="color:#9A3412;">Stale</span>
-        </div>
-        <div class="bento-desc">Wrinkling, loss of crunch, and mild aromatic decline. Great for purees, soups, or cooking.</div>
-    </div>
-    <div class="bento-card" style="border-top: 3px solid #EF4444;">
-        <div class="bento-header">
-            <span style="font-size:20px;">🔴</span>
-            <span class="bento-title" style="color:#991B1B;">Spoiled</span>
-        </div>
-        <div class="bento-desc">Early fungal invasion, deep discoloration, and sour aroma. Unfit for consumption; discard.</div>
-    </div>
-    <div class="bento-card" style="border-top: 3px solid #9333EA;">
-        <div class="bento-header">
-            <span style="font-size:20px;">🟣</span>
-            <span class="bento-title" style="color:#6B21A8;">Rotten</span>
-        </div>
-        <div class="bento-desc">Advanced biological decay, spores, and liquid liquefaction. Hazardous bio-waste — dispose safely.</div>
-    </div>
-</div>
+</header>
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------------------------
-# Session History Table
+# Hero Section (EXACT from index.html)
 # ---------------------------------------------------------------------------
-if st.session_state["history"]:
-    st.markdown("### 🕒 Recent Scans in This Session")
-    st.table(st.session_state["history"][:8])
-
-# ---------------------------------------------------------------------------
-# Team Members & Hackathon Footer
-# ---------------------------------------------------------------------------
-st.markdown("<br><hr style='border:none; border-top:1px solid #E2E8F0; margin:24px 0;'><br>", unsafe_allow_html=True)
 st.markdown("""
-<div style="background:#0F172A; border-radius:18px; padding:32px 36px; color:#F8FAFC;">
-    <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:20px;">
-        <div>
-            <div style="font-family:'Outfit', sans-serif; font-size:22px; font-weight:800; color:#34D399; margin-bottom:6px;">
-                Pak-Angels Mid Program Hackathon
-            </div>
-            <div style="font-size:14px; color:#94A3B8; max-width:440px;">
-                FreshSense AI Food Freshness Detection Platform. Built with Google Antigravity, MobileNetV2, and Python.
-            </div>
+<section class="hero">
+    <div class="hero-bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+    <div class="container hero-inner">
+        <div class="hero-tag">
+            <span class="pulse-dot"></span>
+            Deep Learning Vision System &bull; 82% F1 Accuracy
         </div>
-        <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:12px 24px; font-size:13px;">
-            <div>
-                <b style="color:#FFFFFF;">Muhammad Faseeh (GL)</b><br>
-                <span style="color:#94A3B8;">Group Leader & AI Lead</span>
+        <h1 class="hero-title">
+            Know your food freshness.<br>
+            <span class="gradient-text">Before you taste or serve.</span>
+        </h1>
+        <p class="hero-desc">
+            Instant computer vision classification powered by MobileNetV2. Upload any fruit or vegetable photo to evaluate quality across five distinct biological degradation stages.
+        </p>
+        <div class="hero-actions">
+            <a href="#detect" class="btn btn-primary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Analyze Food Image
+            </a>
+            <a href="#about" class="btn btn-secondary">
+                View Architecture
+            </a>
+        </div>
+        <div class="hero-stats">
+            <div class="stat-box">
+                <span class="stat-value">82%</span>
+                <span class="stat-name">Validation Accuracy</span>
             </div>
-            <div>
-                <b style="color:#FFFFFF;">Umamah Ibreeq Zafar</b><br>
-                <span style="color:#94A3B8;">CV Research & Dataset</span>
+            <div class="stat-sep"></div>
+            <div class="stat-box">
+                <span class="stat-value">13</span>
+                <span class="stat-name">Food Classes Covered</span>
             </div>
-            <div>
-                <b style="color:#FFFFFF;">Anumta Nadeem</b><br>
-                <span style="color:#94A3B8;">UI/UX Design Systems</span>
+            <div class="stat-sep"></div>
+            <div class="stat-box">
+                <span class="stat-value">5</span>
+                <span class="stat-name">Freshness Categories</span>
             </div>
-            <div>
-                <b style="color:#FFFFFF;">Zafar Aman Khattak</b><br>
-                <span style="color:#94A3B8;">System Architecture & QA</span>
+            <div class="stat-sep"></div>
+            <div class="stat-box">
+                <span class="stat-value">&lt; 1s</span>
+                <span class="stat-name">Local CPU Inference</span>
             </div>
         </div>
     </div>
-</div>
+</section>
+""", unsafe_allow_html=True)
+
+# ---------------------------------------------------------------------------
+# Detection Workspace Section (EXACT structure from index.html)
+# ---------------------------------------------------------------------------
+st.markdown("""
+<section id="detect" class="section section-detect">
+    <div class="container">
+        <div class="section-header text-center">
+            <div class="section-label">AI Diagnostic Workspace</div>
+            <h2 class="section-title">Upload Food for Freshness Analysis</h2>
+            <p class="section-subtitle">Supports photos of apples, bananas, tomatoes, carrots, mangoes, cucumbers, and more.</p>
+        </div>
+    </div>
+</section>
+""", unsafe_allow_html=True)
+
+# Session State initialization
+if "selected_image" not in st.session_state:
+    st.session_state["selected_image"] = None
+if "selected_name" not in st.session_state:
+    st.session_state["selected_name"] = ""
+if "history" not in st.session_state:
+    st.session_state["history"] = []
+
+# Workspace layout container
+ws_container = st.container()
+with ws_container:
+    col_left, col_right = st.columns([1, 1], gap="large")
+
+    with col_left:
+        # Check if an image is selected
+        if st.session_state["selected_image"] is None:
+            st.markdown("""
+            <div class="dropzone-card" id="uploadZone" style="cursor:default; min-height:360px;">
+                <div class="dropzone-body" id="uploadContent">
+                    <div class="dropzone-icon-circle">
+                        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                    </div>
+                    <h3 class="dropzone-title">Drag & drop your food image here</h3>
+                    <p class="dropzone-instruction">or select an image using the uploader below</p>
+                    <div class="dropzone-badges">
+                        <span class="file-chip">JPG</span>
+                        <span class="file-chip">JPEG</span>
+                        <span class="file-chip">PNG</span>
+                        <span class="file-chip">WEBP</span>
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+            uploaded_file = st.file_uploader(
+                "Upload food image",
+                type=["jpg", "jpeg", "png", "webp"],
+                key="file_up",
+                label_visibility="collapsed"
+            )
+            if uploaded_file is not None:
+                st.session_state["selected_image"] = Image.open(uploaded_file)
+                st.session_state["selected_name"] = uploaded_file.name
+                st.rerun()
+
+            # Fast Test Produce Chips
+            st.markdown("<p style='font-size:12px; font-weight:600; color:#64748B; margin:16px 0 6px 0; text-transform:uppercase; letter-spacing:0.05em;'>Or Select Sample Produce:</p>", unsafe_allow_html=True)
+            test_samples_dir = os.path.join(os.path.dirname(__file__), "Test Samples")
+            sample_chips = [
+                ("🥒 Fresh Okra", "fresh ocra.jpg"),
+                ("🥭 Fresh Mango", "FreshMango_40.png"),
+                ("🍎 Rotten Apple", "820_RottenApple_71.jpg"),
+                ("🍌 Rotten Banana", "251_RottenBanana_99.png"),
+                ("🍓 Fresh Strawberry", "723_FreshStrawberry_74.jpg"),
+                ("🫑 Rotten Capsicum", "403_RottenCapsicum_86.jpg"),
+            ]
+            chip_cols = st.columns(3)
+            for idx, (lbl, fn) in enumerate(sample_chips):
+                with chip_cols[idx % 3]:
+                    if st.button(lbl, key=f"btn_{fn}"):
+                        p = os.path.join(test_samples_dir, fn)
+                        if os.path.exists(p):
+                            st.session_state["selected_image"] = Image.open(p)
+                            st.session_state["selected_name"] = lbl
+                            st.rerun()
+        else:
+            # Render image preview using original .preview-wrapper
+            img = st.session_state["selected_image"]
+            import io
+            buf = io.BytesIO()
+            img.save(buf, format="JPEG")
+            img_b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
+            img_data_url = f"data:image/jpeg;base64,{img_b64}"
+
+            st.markdown(f"""
+            <div class="dropzone-card" style="padding:0; min-height:400px; cursor:default;">
+                <div class="preview-wrapper" style="display:flex; width:100%; min-height:400px; align-items:center; justify-content:center; background:#0F172A; position:relative;">
+                    <img src="{img_data_url}" alt="Food scan preview" class="preview-img" style="max-height:340px; border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,0.4);">
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+            if st.button("🗑️ Remove Image / Scan Another", key="btn_remove"):
+                st.session_state["selected_image"] = None
+                st.session_state["selected_name"] = ""
+                st.rerun()
+
+    with col_right:
+        if st.session_state["selected_image"] is None:
+            # Idle State (EXACT from index.html)
+            st.markdown("""
+            <div class="result-card-container" style="min-height:400px;">
+                <div class="state-placeholder" id="resultEmpty">
+                    <div class="placeholder-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 14 14"></polyline>
+                        </svg>
+                    </div>
+                    <h4>Awaiting Input Image</h4>
+                    <p>Upload a food photo on the left. The neural network will extract features, classify freshness, and calculate confidence distribution in real-time.</p>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            # Run MobileNetV2 prediction
+            input_arr = preprocess(st.session_state["selected_image"])
+            preds = model.predict(input_arr, verbose=0)
+            probs = [float(p) for p in preds[0]]
+            pred_idx = int(np.argmax(probs))
+            pred_class = CLASS_NAMES[pred_idx]
+            confidence = probs[pred_idx] * 100.0
+            badge_key = CLASS_KEYS.get(pred_class, "fresh")
+            desc = CLASS_DESCRIPTIONS.get(pred_class, "")
+
+            # Generate Probability Bars HTML (EXACT from app.js)
+            bars_html = ""
+            for name, prob in zip(CLASS_NAMES, probs):
+                pct = prob * 100.0
+                bar_k = CLASS_KEYS.get(name, "fresh")
+                bars_html += f"""
+                <div class="prob-row">
+                    <span class="prob-label">{name}</span>
+                    <div class="prob-bar-track">
+                        <div class="prob-bar-fill bar-{bar_k}" style="width:{pct:.1f}%;"></div>
+                    </div>
+                    <span class="prob-value">{pct:.1f}%</span>
+                </div>
+                """
+
+            # Save to history
+            now_str = datetime.now().strftime("%b %d, %Y at %I:%M %p")
+            record = {
+                "filename": st.session_state["selected_name"],
+                "predicted_class": pred_class,
+                "confidence": round(confidence, 1),
+                "timestamp": now_str,
+                "badge": badge_key
+            }
+            if not st.session_state["history"] or st.session_state["history"][0].get("timestamp") != now_str:
+                st.session_state["history"].insert(0, record)
+
+            # Complete State (EXACT from index.html)
+            st.markdown(f"""
+            <div class="result-card-container" style="min-height:400px;">
+                <div class="state-result" id="resultCard">
+                    <div class="result-headline">
+                        <div class="badge-wrapper">
+                            <span class="result-tag badge-{badge_key}" id="resultBadge">{pred_class}</span>
+                        </div>
+                        <span class="confidence-indicator" id="resultConfidence">{confidence:.1f}% Confidence</span>
+                    </div>
+
+                    <p class="result-summary" id="resultDescription">
+                        {desc}
+                    </p>
+
+                    <div class="probability-section">
+                        <div class="prob-title">Confidence Distribution Across 5 Classes</div>
+                        <div class="chart-bars" id="probChart">
+                            {bars_html}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+# ---------------------------------------------------------------------------
+# 5-Stage Freshness Spectrum Section (EXACT from index.html)
+# ---------------------------------------------------------------------------
+st.markdown("""
+<section id="scale" class="section section-scale">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-label">Classification Taxonomy</div>
+            <h2 class="section-title">The 5-Stage Freshness Spectrum</h2>
+            <p class="section-subtitle">Our Agglomerative clustering pipeline groups images into five visually distinctive stages of deterioration.</p>
+        </div>
+
+        <div class="scale-grid">
+            <div class="scale-card scale-c1">
+                <div class="scale-card-header">
+                    <span class="scale-number">01</span>
+                    <span class="scale-status">Fresh</span>
+                </div>
+                <div class="scale-indicator"></div>
+                <p class="scale-desc">Harvest-grade quality, vibrant skin pigmentation, crisp texture, and zero noticeable biological degradation.</p>
+            </div>
+            <div class="scale-card scale-c2">
+                <div class="scale-card-header">
+                    <span class="scale-number">02</span>
+                    <span class="scale-status">Slightly Aged</span>
+                </div>
+                <div class="scale-indicator"></div>
+                <p class="scale-desc">Early oxidation or minor moisture depletion. Completely safe to consume; recommended for near-term preparation.</p>
+            </div>
+            <div class="scale-card scale-c3">
+                <div class="scale-card-header">
+                    <span class="scale-number">03</span>
+                    <span class="scale-status">Stale</span>
+                </div>
+                <div class="scale-indicator"></div>
+                <p class="scale-desc">Noticeable dehydration, softened cellular structure, or loss of aroma. Significant decline in culinary quality.</p>
+            </div>
+            <div class="scale-card scale-c4">
+                <div class="scale-card-header">
+                    <span class="scale-number">04</span>
+                    <span class="scale-status">Spoiled</span>
+                </div>
+                <div class="scale-indicator"></div>
+                <p class="scale-desc">Discoloration, surface softening, and onset of mold or bacterial presence. Not recommended for human intake.</p>
+            </div>
+            <div class="scale-card scale-c5">
+                <div class="scale-card-header">
+                    <span class="scale-number">05</span>
+                    <span class="scale-status">Rotten</span>
+                </div>
+                <div class="scale-indicator"></div>
+                <p class="scale-desc">Advanced microbial degradation, severe fungal growth, structural breakdown. Discard immediately to protect surroundings.</p>
+            </div>
+        </div>
+    </div>
+</section>
+""", unsafe_allow_html=True)
+
+# ---------------------------------------------------------------------------
+# Architecture & Engineering Section (EXACT from index.html)
+# ---------------------------------------------------------------------------
+st.markdown("""
+<section id="about" class="section section-about">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-label">Engineering & Tech Stack</div>
+            <h2 class="section-title">Built on Computer Vision Research</h2>
+            <p class="section-subtitle">Trained on thousands of curated fruit and vegetable images across 13 diverse species.</p>
+        </div>
+
+        <div class="cards-bento">
+            <div class="bento-card bento-emerald">
+                <div class="bento-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                </div>
+                <h3>MobileNetV2 Neural Network</h3>
+                <p>Features inverted residual bottlenecks and depthwise separable convolutions to achieve high accuracy with minimal parameter overhead.</p>
+                <div class="bento-footer">Agglomerative weights &bull; 82% accuracy</div>
+            </div>
+
+            <div class="bento-card bento-amber">
+                <div class="bento-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                </div>
+                <h3>Keras 3 NumPy Engine</h3>
+                <p>Silent CPU inference powered by Keras 3 with NumPy math primitives. Zero GPU dependencies or heavy CUDA setup needed.</p>
+                <div class="bento-footer">Zero-latency backend pipeline</div>
+            </div>
+
+            <div class="bento-card bento-rose">
+                <div class="bento-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+                </div>
+                <h3>13 Produce Categories</h3>
+                <p>Trained on Apple, Banana, Bell Pepper, Bitter Gourd, Capsicum, Carrot, Cucumber, Mango, Okra, Orange, Potato, Strawberry, and Tomato.</p>
+                <div class="bento-footer">6.4 GB curated dataset</div>
+            </div>
+
+            <div class="bento-card bento-indigo">
+                <div class="bento-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+                </div>
+                <h3>Microservice Architecture</h3>
+                <p>RESTful JSON endpoints handling multipart image streaming, image normalization (128&times;128), and transaction history persistence.</p>
+                <div class="bento-footer">Production-grade Python API</div>
+            </div>
+
+            <div class="bento-card bento-cyan">
+                <div class="bento-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                </div>
+                <h3>Computer Vision Preprocessing</h3>
+                <p>Gaussian blur noise reduction, Canny edge detection, and RGB normalization at 128&times;128 resolution for consistent inference.</p>
+                <div class="bento-footer">Robust invariant transforms</div>
+            </div>
+
+            <div class="bento-card bento-purple">
+                <div class="bento-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+                </div>
+                <h3>Agglomerative Cluster Hierarchy</h3>
+                <p>Euclidean metric with Ward linkage grouping to discover non-linear quality degradation boundaries without manual annotation bias.</p>
+                <div class="bento-footer">Unsupervised quality discovery</div>
+            </div>
+        </div>
+    </div>
+</section>
+""", unsafe_allow_html=True)
+
+# ---------------------------------------------------------------------------
+# Scan History Section (EXACT from index.html)
+# ---------------------------------------------------------------------------
+history_html = ""
+if st.session_state["history"]:
+    cards_html = ""
+    for item in st.session_state["history"][:6]:
+        b_key = item.get("badge", "fresh")
+        cards_html += f"""
+        <div class="history-item-card" style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:14px; padding:18px 20px; box-shadow:0 2px 8px rgba(15,23,42,0.04);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span class="result-tag badge-{b_key}" style="font-size:12px; padding:4px 12px;">{item['predicted_class']}</span>
+                <span style="font-family:'JetBrains Mono', monospace; font-size:13px; font-weight:600; color:#475569;">{item['confidence']}%</span>
+            </div>
+            <div style="font-size:14px; font-weight:700; color:#0F172A; margin-bottom:4px;">{item['filename']}</div>
+            <div style="font-size:12px; color:#94A3B8;">{item['timestamp']}</div>
+        </div>
+        """
+    history_html = f"""
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px; margin-top:20px;">
+        {cards_html}
+    </div>
+    """
+else:
+    history_html = """
+    <div class="history-empty-box" id="historyEmpty">
+        <div class="empty-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        </div>
+        <h4>No previous scan records</h4>
+        <p>Upload a food picture in the workspace above to generate your first freshness record.</p>
+    </div>
+    """
+
+st.markdown(f"""
+<section id="history" class="section section-history">
+    <div class="container">
+        <div class="history-topbar">
+            <div>
+                <div class="section-label">Audit Log</div>
+                <h2 class="section-title">Diagnostic History</h2>
+                <p class="section-subtitle">Review recent food classification records and confidence metrics.</p>
+            </div>
+        </div>
+        {history_html}
+    </div>
+</section>
+""", unsafe_allow_html=True)
+
+# ---------------------------------------------------------------------------
+# Footer (EXACT from index.html)
+# ---------------------------------------------------------------------------
+footer_logo_html = f'<img src="{LOGO_SRC}" alt="FreshSense" class="footer-logo">' if LOGO_SRC else '<span style="font-size:24px;">🍃</span>'
+
+st.markdown(f"""
+<footer class="footer">
+    <div class="container footer-content">
+        <div class="footer-left">
+            {footer_logo_html}
+            <div>
+                <div class="footer-brand-name">FreshSense</div>
+                <div class="footer-sub">Deep Learning Food Spoilage Diagnostic Platform &bull; Pak-Angels Mid Program Hackathon</div>
+            </div>
+        </div>
+        <div class="footer-right">
+            <span>Muhammad Faseeh (GL)</span> &bull; 
+            <span>Umamah Ibreeq Zafar</span> &bull; 
+            <span>Anumta Nadeem</span> &bull; 
+            <span>Zafar Aman Khattak</span>
+        </div>
+    </div>
+</footer>
 """, unsafe_allow_html=True)
