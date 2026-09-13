@@ -1,0 +1,226 @@
+[
+  {
+    "id": "8c343769ecb34327837aabc25d1e0625",
+    "filename": "fresh ocra.jpg",
+    "image_url": "/static/uploads/8c343769ecb34327837aabc25d1e0625.jpg",
+    "predicted_class": "Fresh",
+    "confidence": 94.6,
+    "description": "This item looks fresh and safe to consume. No visible signs of aging or spoilage.",
+    "probabilities": {
+      "Fresh": 94.6,
+      "Slightly Aged": 0.0,
+      "Stale": 2.1,
+      "Spoiled": 2.9,
+      "Rotten": 0.3
+    },
+    "timestamp": "Sep 13, 2026 at 04:05 PM"
+  },
+  {
+    "id": "c618f884243e4bf49284bc62c2b29ab5",
+    "filename": "FreshMango_40.png",
+    "image_url": "/static/uploads/c618f884243e4bf49284bc62c2b29ab5.png",
+    "predicted_class": "Stale",
+    "confidence": 99.6,
+    "description": "Noticeable aging present. Quality has declined \u2014 consume with caution.",
+    "probabilities": {
+      "Fresh": 0.1,
+      "Slightly Aged": 0.0,
+      "Stale": 99.6,
+      "Spoiled": 0.0,
+      "Rotten": 0.3
+    },
+    "timestamp": "Sep 13, 2026 at 04:05 PM"
+  },
+  {
+    "id": "15005f17e040403aa0386eddee423604",
+    "filename": "723_FreshStrawberry_74.jpg",
+    "image_url": "/static/uploads/15005f17e040403aa0386eddee423604.jpg",
+    "predicted_class": "Stale",
+    "confidence": 90.7,
+    "description": "Noticeable aging present. Quality has declined \u2014 consume with caution.",
+    "probabilities": {
+      "Fresh": 0.7,
+      "Slightly Aged": 0.2,
+      "Stale": 90.7,
+      "Spoiled": 2.1,
+      "Rotten": 6.4
+    },
+    "timestamp": "Sep 13, 2026 at 03:10 PM"
+  },
+  {
+    "id": "bd836b73a285454b85e5e84b3a9b4741",
+    "filename": "403_RottenCapsicum_86.jpg",
+    "image_url": "/static/uploads/bd836b73a285454b85e5e84b3a9b4741.jpg",
+    "predicted_class": "Spoiled",
+    "confidence": 49.6,
+    "description": "Significant spoilage detected. This item is not recommended for consumption.",
+    "probabilities": {
+      "Fresh": 2.1,
+      "Slightly Aged": 38.0,
+      "Stale": 1.5,
+      "Spoiled": 49.6,
+      "Rotten": 8.7
+    },
+    "timestamp": "Sep 13, 2026 at 03:10 PM"
+  },
+  {
+    "id": "4f66b832bf9040c5bcb16ee602bca5fc",
+    "filename": "251_RottenBanana_99.png",
+    "image_url": "/static/uploads/4f66b832bf9040c5bcb16ee602bca5fc.png",
+    "predicted_class": "Rotten",
+    "confidence": 71.9,
+    "description": "Severe decay detected. This item should be discarded immediately.",
+    "probabilities": {
+      "Fresh": 0.5,
+      "Slightly Aged": 1.3,
+      "Stale": 0.2,
+      "Spoiled": 26.1,
+      "Rotten": 71.9
+    },
+    "timestamp": "Sep 13, 2026 at 03:10 PM"
+  },
+  {
+    "id": "9c3c0bae2b0a4983a29bdd0f642efe95",
+    "filename": "820_RottenApple_71.jpg",
+    "image_url": "/static/uploads/9c3c0bae2b0a4983a29bdd0f642efe95.jpg",
+    "predicted_class": "Spoiled",
+    "confidence": 95.9,
+    "description": "Significant spoilage detected. This item is not recommended for consumption.",
+    "probabilities": {
+      "Fresh": 1.1,
+      "Slightly Aged": 0.3,
+      "Stale": 0.1,
+      "Spoiled": 95.9,
+      "Rotten": 2.7
+    },
+    "timestamp": "Sep 13, 2026 at 03:10 PM"
+  },
+  {
+    "id": "a9e3b2d3404c4b7694e617ddcb45266f",
+    "filename": "RottenMango_1.jpg",
+    "image_url": "/static/uploads/a9e3b2d3404c4b7694e617ddcb45266f.jpg",
+    "predicted_class": "Rotten",
+    "confidence": 86.4,
+    "description": "Severe decay detected. This item should be discarded immediately.",
+    "probabilities": {
+      "Fresh": 1.0,
+      "Slightly Aged": 3.2,
+      "Stale": 7.1,
+      "Spoiled": 2.3,
+      "Rotten": 86.4
+    },
+    "timestamp": "Sep 13, 2026 at 03:10 PM"
+  },
+  {
+    "id": "7301a4d600ca41d7b4de4837e8bf91cd",
+    "filename": "1276_FreshBittergroud_70.jpg",
+    "image_url": "/static/uploads/7301a4d600ca41d7b4de4837e8bf91cd.jpg",
+    "predicted_class": "Fresh",
+    "confidence": 98.7,
+    "description": "This item looks fresh and safe to consume. No visible signs of aging or spoilage.",
+    "probabilities": {
+      "Fresh": 98.7,
+      "Slightly Aged": 0.3,
+      "Stale": 0.0,
+      "Spoiled": 0.6,
+      "Rotten": 0.4
+    },
+    "timestamp": "Sep 13, 2026 at 03:09 PM"
+  },
+  {
+    "id": "fc3ba3bcb149456182e8bbd9a186cc9d",
+    "filename": "251_RottenBanana_99.png",
+    "image_url": "/static/uploads/fc3ba3bcb149456182e8bbd9a186cc9d.png",
+    "predicted_class": "Rotten",
+    "confidence": 71.9,
+    "description": "Severe decay detected. This item should be discarded immediately.",
+    "probabilities": {
+      "Fresh": 0.5,
+      "Slightly Aged": 1.3,
+      "Stale": 0.2,
+      "Spoiled": 26.1,
+      "Rotten": 71.9
+    },
+    "timestamp": "Sep 13, 2026 at 03:04 PM"
+  },
+  {
+    "id": "f49da6ca83e348d598913624f4cddfdd",
+    "filename": "RottenMango_1.jpg",
+    "image_url": "/static/uploads/f49da6ca83e348d598913624f4cddfdd.jpg",
+    "predicted_class": "Rotten",
+    "confidence": 86.4,
+    "description": "Severe decay detected. This item should be discarded immediately.",
+    "probabilities": {
+      "Fresh": 1.0,
+      "Slightly Aged": 3.2,
+      "Stale": 7.1,
+      "Spoiled": 2.3,
+      "Rotten": 86.4
+    },
+    "timestamp": "Sep 13, 2026 at 03:02 PM"
+  },
+  {
+    "id": "e95c316eb7e3464ba9613d128eba9929",
+    "filename": "Screenshot 2026-07-30 221853.png",
+    "image_url": "/static/uploads/e95c316eb7e3464ba9613d128eba9929.png",
+    "predicted_class": "Spoiled",
+    "confidence": 59.3,
+    "description": "Significant spoilage detected. This item is not recommended for consumption.",
+    "probabilities": {
+      "Fresh": 11.9,
+      "Slightly Aged": 1.1,
+      "Stale": 11.9,
+      "Spoiled": 59.3,
+      "Rotten": 15.7
+    },
+    "timestamp": "Sep 13, 2026 at 02:58 PM"
+  },
+  {
+    "id": "e027e0cda97b46b6b7e1dbfe187c29b2",
+    "filename": "Screenshot 2026-09-01 030734.png",
+    "image_url": "/static/uploads/e027e0cda97b46b6b7e1dbfe187c29b2.png",
+    "predicted_class": "Fresh",
+    "confidence": 41.8,
+    "description": "This item looks fresh and safe to consume. No visible signs of aging or spoilage.",
+    "probabilities": {
+      "Fresh": 41.8,
+      "Slightly Aged": 1.9,
+      "Stale": 7.0,
+      "Spoiled": 37.6,
+      "Rotten": 11.7
+    },
+    "timestamp": "Sep 13, 2026 at 02:58 PM"
+  },
+  {
+    "id": "33c067f98d7f46f89927cea628b3b2d2",
+    "filename": "Screenshot 2026-09-12 171200.png",
+    "image_url": "/static/uploads/33c067f98d7f46f89927cea628b3b2d2.png",
+    "predicted_class": "Rotten",
+    "confidence": 53.7,
+    "description": "Severe decay detected. This item should be discarded immediately.",
+    "probabilities": {
+      "Fresh": 5.5,
+      "Slightly Aged": 0.5,
+      "Stale": 5.9,
+      "Spoiled": 34.4,
+      "Rotten": 53.7
+    },
+    "timestamp": "Sep 13, 2026 at 02:58 PM"
+  },
+  {
+    "id": "47ba796f451249e585d0a41a8fe73641",
+    "filename": "mango rotten.jpg",
+    "image_url": "/static/uploads/47ba796f451249e585d0a41a8fe73641.jpg",
+    "predicted_class": "Stale",
+    "confidence": 44.6,
+    "description": "Noticeable aging present. Quality has declined \u2014 consume with caution.",
+    "probabilities": {
+      "Fresh": 5.4,
+      "Slightly Aged": 1.9,
+      "Stale": 44.6,
+      "Spoiled": 17.2,
+      "Rotten": 30.9
+    },
+    "timestamp": "Sep 12, 2026 at 09:25 PM"
+  }
+]

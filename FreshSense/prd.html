@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FreshSense — Product Requirements Document (PRD)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap');
+
+        @page {
+            size: A4;
+            margin: 20mm 18mm 22mm 18mm;
+            @bottom-right {
+                content: "Page " counter(page);
+                font-family: 'Plus Jakarta Sans', sans-serif;
+                font-size: 8pt;
+                color: #64748b;
+            }
+            @bottom-left {
+                content: "FreshSense PRD • Confidential";
+                font-family: 'Plus Jakarta Sans', sans-serif;
+                font-size: 8pt;
+                color: #94a3b8;
+            }
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            color: #1e293b;
+            background-color: #ffffff;
+            line-height: 1.55;
+            font-size: 9.5pt;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        /* --- Cover / Header Page --- */
+        .cover-page {
+            padding-bottom: 25px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #0f172a;
+        }
+
+        .cover-badge {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 7.5pt;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #047857;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            padding: 3px 10px;
+            border-radius: 4px;
+            margin-bottom: 14px;
+        }
+
+        .cover-title {
+            font-size: 26pt;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            margin-bottom: 8px;
+        }
+
+        .cover-subtitle {
+            font-size: 13pt;
+            font-weight: 500;
+            color: #059669;
+            margin-bottom: 16px;
+            letter-spacing: -0.01em;
+        }
+
+        .cover-meta {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            padding-top: 14px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 8.5pt;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            font-size: 7pt;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+            color: #64748b;
+            margin-bottom: 2px;
+        }
+
+        .meta-value {
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        /* --- Typography & Headings --- */
+        h1, h2, h3, h4 {
+            color: #0f172a;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            page-break-after: avoid;
+        }
+
+        h2 {
+            font-size: 14pt;
+            margin-top: 26px;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h2 .sec-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10pt;
+            color: #059669;
+            font-weight: 700;
+        }
+
+        h3 {
+            font-size: 11pt;
+            margin-top: 16px;
+            margin-bottom: 6px;
+            color: #1e293b;
+        }
+
+        h4 {
+            font-size: 9.5pt;
+            margin-top: 10px;
+            margin-bottom: 4px;
+            color: #334155;
+        }
+
+        p {
+            margin-bottom: 10px;
+            color: #334155;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 10px;
+            color: #334155;
+        }
+
+        li {
+            margin-bottom: 4px;
+        }
+
+        /* --- Custom UI Cards & Containers --- */
+        .callout {
+            background: #f8fafc;
+            border-left: 3.5px solid #059669;
+            padding: 10px 14px;
+            border-radius: 0 6px 6px 0;
+            margin: 12px 0;
+            font-size: 9pt;
+            page-break-inside: avoid;
+        }
+
+        .callout-title {
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 3px;
+        }
+
+        .callout.warning {
+            border-left-color: #d97706;
+            background: #fffbeb;
+        }
+
+        .callout.info {
+            border-left-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        /* --- Metric Grid --- */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 14px 0;
+            page-break-inside: avoid;
+        }
+
+        .metric-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 10px 12px;
+            text-align: center;
+        }
+
+        .metric-val {
+            font-size: 16pt;
+            font-weight: 800;
+            color: #059669;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            line-height: 1.1;
+        }
+
+        .metric-label {
+            font-size: 7.5pt;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-top: 3px;
+        }
+
+        /* --- Tables --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0 16px 0;
+            font-size: 8.5pt;
+            page-break-inside: avoid;
+        }
+
+        th, td {
+            padding: 7px 9px;
+            text-align: left;
+            vertical-align: top;
+            border: 1px solid #cbd5e1;
+        }
+
+        th {
+            background-color: #0f172a;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 8pt;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        /* --- Badges --- */
+        .badge {
+            display: inline-block;
+            font-size: 7.5pt;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .badge-fresh { background: #d1fae5; color: #065f46; }
+        .badge-aged { background: #fef3c7; color: #92400e; }
+        .badge-stale { background: #ffedd5; color: #9a3412; }
+        .badge-spoiled { background: #fee2e2; color: #991b1b; }
+        .badge-rotten { background: #ffe4e6; color: #881337; }
+
+        /* --- Architecture Box --- */
+        .arch-diagram {
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 14px 18px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 7.5pt;
+            line-height: 1.45;
+            margin: 14px 0;
+            page-break-inside: avoid;
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        /* --- Dedicated Hackathon Title Page (Page 1) --- */
+        .hackathon-title-page {
+            min-height: 235mm;
+            max-height: 245mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 30mm 15mm 20mm 15mm;
+            page-break-after: always;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .hackathon-top-badge {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 8pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: #047857;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            padding: 6px 18px;
+            border-radius: 9999px;
+            margin-bottom: 20px;
+        }
+
+        .hackathon-main-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 24pt;
+            font-weight: 900;
+            color: #0f172a;
+            line-height: 1.22;
+            letter-spacing: -0.03em;
+            text-transform: uppercase;
+            max-width: 620px;
+            margin: 0 auto;
+        }
+
+        .hackathon-divider {
+            width: 56px;
+            height: 4px;
+            background: linear-gradient(90deg, #10b981, #059669);
+            border-radius: 2px;
+            margin: 24px auto;
+        }
+
+        .hackathon-project-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 8pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .hackathon-project-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 32pt;
+            font-weight: 800;
+            color: #059669;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+        }
+
+        .hackathon-team-container {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 22px 28px;
+            max-width: 460px;
+            margin: 0 auto;
+            text-align: left;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+        }
+
+        .hackathon-team-heading {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 8pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #059669;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .hackathon-member-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .hackathon-member-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 10pt;
+        }
+
+        .hackathon-member-item:last-child {
+            border-bottom: none;
+        }
+
+        .hackathon-member-name {
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .hackathon-member-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 7.5pt;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .hackathon-member-tag.leader {
+            background: #d1fae5;
+            color: #065f46;
+            font-weight: 700;
+        }
+
+        .hackathon-footer-meta {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 8pt;
+            color: #94a3b8;
+            letter-spacing: 0.04em;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== HACKATHON TITLE PAGE (PAGE 1) ==================== -->
+    <div class="hackathon-title-page">
+        <div class="hackathon-title-top">
+            <div class="hackathon-top-badge">Hackathon Project Submission</div>
+            <h1 class="hackathon-main-title">PAK-ANGELS MID PROGRAM HACKATHON</h1>
+            <div class="hackathon-divider"></div>
+            
+            <div class="hackathon-project-box">
+                <div class="hackathon-project-label">Project Title</div>
+                <div class="hackathon-project-title">FreshSense</div>
+            </div>
+        </div>
+
+        <div class="hackathon-team-container">
+            <div class="hackathon-team-heading">
+                <span>Team Members</span>
+                <span>4 Members</span>
+            </div>
+            <ul class="hackathon-member-list">
+                <li class="hackathon-member-item">
+                    <span class="hackathon-member-name">Muhammad Faseeh (GL)</span>
+                    <span class="hackathon-member-tag leader">Group Leader</span>
+                </li>
+                <li class="hackathon-member-item">
+                    <span class="hackathon-member-name">Umamah Ibreeq Zafar</span>
+                    <span class="hackathon-member-tag">Member</span>
+                </li>
+                <li class="hackathon-member-item">
+                    <span class="hackathon-member-name">Anumta Nadeem</span>
+                    <span class="hackathon-member-tag">Member</span>
+                </li>
+                <li class="hackathon-member-item">
+                    <span class="hackathon-member-name">Zafar Aman Khattak</span>
+                    <span class="hackathon-member-tag">Member</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="hackathon-footer-meta">
+            Product Requirements Document (PRD) &bull; September 2026
+        </div>
+    </div>
+
+    <!-- ==================== COVER SECTION ==================== -->
+    <div class="cover-page">
+        <div class="cover-badge">Product Requirements Document (PRD) • v2.1</div>
+        <h1 class="cover-title">FreshSense</h1>
+        <div class="cover-subtitle">Deep Learning & Computer Vision Platform for Automated Food Freshness Diagnostics</div>
+        <p style="font-size: 10pt; color: #475569; max-width: 95%; margin-bottom: 16px;">
+            A unified engineering and product specification for an AI-powered visual food freshness classification engine. FreshSense leverages deep convolutional neural network embeddings (MobileNetV2) trained over agglomeratively clustered multi-source datasets to categorize produce across five discrete quality degradation stages in under one second.
+        </p>
+        <div class="cover-meta">
+            <div class="meta-item">
+                <span class="meta-label">Project Status</span>
+                <span class="meta-value">MVP Deployed (Active)</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Target Audience</span>
+                <span class="meta-value">Consumers, Grocers, Agritech</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Model Architecture</span>
+                <span class="meta-value">MobileNetV2 (Agglomerative)</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Date & Version</span>
+                <span class="meta-value">September 2026 • v2.1.0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SECTION 1: EXECUTIVE SUMMARY ==================== -->
+    <h2><span class="sec-num">01</span> Executive Summary & Vision</h2>
+    <p>
+        Food spoilage and wastage represent a multi-billion dollar economic and environmental challenge worldwide. Approximately one-third of all food produced for human consumption is lost or wasted annually, with produce (fruits and vegetables) exhibiting the highest wastage rates. A major contributor is the absence of accessible, objective, and automated tools for consumers and retailers to accurately evaluate the freshness lifecycle before irreversible spoilage occurs.
+    </p>
+    <p>
+        <strong>FreshSense</strong> bridges this gap by deploying modern computer vision directly to web and edge interfaces. Users upload or capture produce imagery, which is preprocessed and evaluated by an optimized MobileNetV2 deep learning classifier. Rather than relying on simple binary (Fresh/Rotten) heuristics, FreshSense scores the item across <strong>five biological degradation stages</strong> (Fresh, Slightly Aged, Stale, Spoiled, Rotten) with confidence scoring and persistent audit history.
+    </p>
+
+    <div class="metric-grid">
+        <div class="metric-card">
+            <div class="metric-val">82%</div>
+            <div class="metric-label">Macro F1 Score</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-val">13</div>
+            <div class="metric-label">Food Species</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-val">5</div>
+            <div class="metric-label">Freshness Stages</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-val">&lt; 850ms</div>
+            <div class="metric-label">Inference Latency</div>
+        </div>
+    </div>
+
+    <!-- ==================== SECTION 2: PROBLEM STATEMENT & MARKET OPPORTUNITY ==================== -->
+    <h2><span class="sec-num">02</span> Problem Statement & Value Proposition</h2>
+    <h3>2.1 The Core Problem</h3>
+    <ul>
+        <li><strong>Subjective Human Inspection:</strong> Traditional freshness evaluation relies on manual sensory estimation (touch, smell, surface sight), which varies significantly across individuals and conditions.</li>
+        <li><strong>Binary Simplification:</strong> Existing consumer-facing classification systems reduce food quality to binary Fresh vs. Rotten states, failing to inform users when produce is in early degradation ("Slightly Aged" or "Stale") where salvage or prompt consumption is viable.</li>
+        <li><strong>Cloud Latency & Privacy:</strong> Many ML offerings require massive GPU cloud clusters, adding latency, data privacy concerns, and heavy hosting infrastructure costs.</li>
+    </ul>
+
+    <h3>2.2 Proposed Solution & Value Proposition</h3>
+    <p>
+        FreshSense provides a lightweight, client-accessible inference service powered by an 11.5 MB optimized MobileNetV2 model running locally over CPU utilizing Keras 3 with NumPy/JAX execution. The system features:
+    </p>
+    <ol>
+        <li><strong>Multi-Class Granularity:</strong> Five distinct stages reflecting real culinary and microbiological states.</li>
+        <li><strong>Explainable Probability Distribution:</strong> Full visibility into confidence metrics across all five classes.</li>
+        <li><strong>Local & Resilient Execution:</strong> Zero GPU requirement, zero external API dependencies, and high execution stability across operating systems.</li>
+        <li><strong>Audit Logging:</strong> Chronological scan archive allowing quality tracking across batches and dates.</li>
+    </ol>
+
+    <!-- ==================== SECTION 3: USER PERSONAS & KEY USE CASES ==================== -->
+    <h2><span class="sec-num">03</span> Target Personas & Key User Journeys</h2>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 22%;">User Persona</th>
+                <th style="width: 38%;">Pain Points & Goals</th>
+                <th style="width: 40%;">Primary FreshSense Workflow</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <strong>Home Consumer</strong><br>
+                    <em>(Priya, Meal Planner)</em>
+                </td>
+                <td>
+                    Unsure whether produce in refrigerator has degraded or remains safe to feed family. Aims to minimize grocery budget waste.
+                </td>
+                <td>
+                    Takes a smartphone photo of suspicious produce &rarr; drops into web interface &rarr; observes "Slightly Aged (89%)" &rarr; decides to cook into soup immediately rather than discard.
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <strong>Retail Produce Lead</strong><br>
+                    <em>(Marco, Grocery Manager)</em>
+                </td>
+                <td>
+                    Daily shelf sorting requires fast decisions on markdowns, food bank donations, or composting. Needs standardized consistency.
+                </td>
+                <td>
+                    Scans crate sample images &rarr; flags items scoring "Stale" for immediate 50% discount shelf &rarr; routes "Spoiled" lots for immediate vendor credit claim.
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <strong>Agritech Supply Auditor</strong><br>
+                    <em>(David, Logistics QC)</em>
+                </td>
+                <td>
+                    Receiving bulk cold-storage shipments; requires fast spot audits to accept/reject distributor lots with timestamped proof.
+                </td>
+                <td>
+                    Uploads multiple batch inspection images &rarr; reviews confidence logs &rarr; exports audit history table as objective inspection documentation.
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- ==================== SECTION 4: FUNCTIONAL REQUIREMENTS ==================== -->
+    <h2><span class="sec-num">04</span> Functional Requirements (FR)</h2>
+
+    <h3>4.1 Image Ingestion & Input Pipeline</h3>
+    <ul>
+        <li><strong>FR-1.1 (Dropzone Ingestion):</strong> The UI shall provide an interactive Drag-and-Drop area with visual drag-over feedback and click-to-browse fallback.</li>
+        <li><strong>FR-1.2 (Format Validation):</strong> The system must accept standard web formats: <code>.jpg</code>, <code>.jpeg</code>, <code>.png</code>, and <code>.webp</code>. Unsupported formats must return a clean client error without crashing.</li>
+        <li><strong>FR-1.3 (Client Preview & Dismissal):</strong> Upon file selection, an instant client-side thumbnail preview shall render with a dedicated dismiss button to cancel or re-upload.</li>
+    </ul>
+
+    <h3>4.2 Computer Vision Preprocessing</h3>
+    <ul>
+        <li><strong>FR-2.1 (Standardized Geometry):</strong> All uploaded imagery must be programmatically converted to RGB and resized to exact dimensions of <code>128 &times; 128 &times; 3</code> pixels.</li>
+        <li><strong>FR-2.2 (Floating-Point Normalization):</strong> Pixel values must be cast to 32-bit floats and scaled between <code>[0.0, 1.0]</code> via division by 255.0.</li>
+        <li><strong>FR-2.3 (Batch Dimension Packaging):</strong> Input tensors must be formatted as <code>(1, 128, 128, 3)</code> matching Keras model tensor requirements.</li>
+    </ul>
+
+    <h3>4.3 Deep Learning Quality Inference Engine</h3>
+    <ul>
+        <li><strong>FR-3.1 (Multi-Class Prediction):</strong> The engine must evaluate input tensors and output a Softmax probability vector across five classes: <code>Fresh</code>, <code>Slightly Aged</code>, <code>Stale</code>, <code>Spoiled</code>, and <code>Rotten</code>.</li>
+        <li><strong>FR-3.2 (Argmax Class Assignment):</strong> The designated prediction class shall correspond to the highest probability score.</li>
+        <li><strong>FR-3.3 (Silent Inference Mode):</strong> Inference calls must execute with <code>verbose=0</code> to eliminate stdout terminal escape sequences and prevent Windows C runtime I/O exceptions (Errno 22).</li>
+    </ul>
+
+    <h3>4.4 Explainable Results & Data Presentation</h3>
+    <ul>
+        <li><strong>FR-4.1 (Primary Status Badge):</strong> Results must display a prominent, color-coded status badge with associated percentage confidence score.</li>
+        <li><strong>FR-4.2 (Actionable Culinary Guidance):</strong> Each category must render an automated plain-language recommendation regarding safety and consumption.</li>
+        <li><strong>FR-4.3 (Confidence Distribution Bars):</strong> All five classes must render individual animated horizontal progress bars showing the model's computed probability distribution.</li>
+    </ul>
+
+    <h3>4.5 Diagnostic History & Persistent Audit Log</h3>
+    <ul>
+        <li><strong>FR-5.1 (Persistent Archival):</strong> Each successful scan must be stored in <code>history.json</code> with a unique UUID, original filename, static image URI, prediction class, confidence score, full probability dictionary, and formatted timestamp.</li>
+        <li><strong>FR-5.2 (History Invalidation & Cleanup):</strong> The system must provide a <code>DELETE /history</code> endpoint that purges records and flushes uploaded temporary artifacts.</li>
+    </ul>
+
+    <!-- ==================== SECTION 5: TECHNICAL ARCHITECTURE & DATA FLOW ==================== -->
+    <h2><span class="sec-num">05</span> Technical Architecture & Data Flow</h2>
+    <div class="arch-diagram">
++--------------------+        +--------------------+        +-------------------------+
+|   Client Browser   |  POST  |    Flask Server    |        |  MobileNetV2 AI Engine  |
+|  (HTML5 / JS / CSS)| -----> |   (Python 3.14)    | -----> |  (Keras 3 NumPy Backend)|
++--------------------+        +--------------------+        +-------------------------+
+         |                              |                                |
+         | 1. Drag & Drop Image         | 2. Save image to static folder | 4. Execute Inference
+         |    (JPG / PNG / WebP)        | 3. Resize 128x128 & Normalize  |    (Silent verbose=0)
+         |                              |                                |
+         |                              | <------------------------------+
+         |                              | 5. Softmax Class Probabilities
+         |                              | 6. Persist to history.json
+         | <----------------------------+
+         | 7. JSON Response: { class, confidence, probabilities, timestamp }
+         | 8. Animate distribution bars & render color-coded badge
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Subsystem Layer</th>
+                <th>Technology Component</th>
+                <th>Architectural Justification & Role</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Deep Learning Core</strong></td>
+                <td>MobileNetV2 (Agglomerative)</td>
+                <td>11.5 MB model weight footprint; depthwise separable convs; high F1-score (0.82) with low CPU overhead.</td>
+            </tr>
+            <tr>
+                <td><strong>Inference Engine</strong></td>
+                <td>Keras 3.15 + NumPy Backend</td>
+                <td>Zero TensorFlow / CUDA dependency; runs on standard hardware environments with immediate startup.</td>
+            </tr>
+            <tr>
+                <td><strong>Application Server</strong></td>
+                <td>Python 3.14 + Flask 3.1</td>
+                <td>Lightweight WSGI/REST server with minimal latency overhead for multipart file streaming and JSON APIs.</td>
+            </tr>
+            <tr>
+                <td><strong>Image Processing</strong></td>
+                <td>Pillow (PIL 12.3)</td>
+                <td>Fast C-optimized image decoding, conversion, and bicubic interpolation at 128&times;128.</td>
+            </tr>
+            <tr>
+                <td><strong>Frontend Client</strong></td>
+                <td>Semantic HTML5 + Custom CSS + ES6</td>
+                <td>Dependency-free single page application with modern typography, glassmorphism-free clean aesthetic.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- ==================== SECTION 6: ML DATASET & CLUSTERING METHODOLOGY ==================== -->
+    <h2><span class="sec-num">06</span> Machine Learning Pipeline & Benchmark Evaluation</h2>
+
+    <h3>6.1 Curated Multi-Source Dataset</h3>
+    <p>
+        The underlying training corpus incorporates a merged and normalized collection of three public Kaggle food freshness repositories (AlineSellwia, Swoyam2609, and Muhriddin Muxiddinov), totaling <strong>6.41 GB</strong> across 13 primary produce categories:
+    </p>
+    <ul>
+        <li><strong>Fruits:</strong> Fresh & Rotten variants of Apple, Banana, Mango, Orange, Strawberry.</li>
+        <li><strong>Vegetables:</strong> Fresh & Rotten variants of Bell Pepper, Bitter Gourd, Capsicum, Carrot, Cucumber, Okra, Potato, Tomato.</li>
+        <li><strong>Standard Transformations:</strong> Noise reduction using Gaussian blur, Canny edge detection, brightness adjustments, horizontal flipping, and &plusmn;15&deg; rotations to prevent overfitting.</li>
+    </ul>
+
+    <h3>6.2 Clustering Validation: Agglomerative vs. K-Means</h3>
+    <p>
+        Because natural food decay is a continuous biological spectrum rather than a hard boundary, unsupervised clustering was employed on image feature embeddings to discover consistent degradation stages. Two primary strategies were trained across 8 model architectures:
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Model Architecture</th>
+                <th>K-Means Accuracy</th>
+                <th>K-Means Macro F1</th>
+                <th>Agglomerative Accuracy</th>
+                <th>Agglomerative Macro F1</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>AlexNet</td>
+                <td>0.72</td>
+                <td>0.70</td>
+                <td><strong>0.84</strong></td>
+                <td><strong>0.83</strong></td>
+            </tr>
+            <tr>
+                <td><strong>MobileNetV2 (Selected)</strong></td>
+                <td>0.77</td>
+                <td>0.75</td>
+                <td><strong>0.82</strong></td>
+                <td><strong>0.82</strong></td>
+            </tr>
+            <tr>
+                <td>DenseNet121</td>
+                <td>0.75</td>
+                <td>0.74</td>
+                <td>0.83</td>
+                <td>0.82</td>
+            </tr>
+            <tr>
+                <td>Xception</td>
+                <td>0.72</td>
+                <td>0.70</td>
+                <td>0.81</td>
+                <td>0.80</td>
+            </tr>
+            <tr>
+                <td>InceptionV3</td>
+                <td>0.74</td>
+                <td>0.72</td>
+                <td>0.74</td>
+                <td>0.73</td>
+            </tr>
+            <tr>
+                <td>VGG16</td>
+                <td>0.66</td>
+                <td>0.64</td>
+                <td>0.70</td>
+                <td>0.57</td>
+            </tr>
+            <tr>
+                <td>VGG19</td>
+                <td>0.68</td>
+                <td>0.65</td>
+                <td>0.66</td>
+                <td>0.53</td>
+            </tr>
+            <tr>
+                <td>ResNet50</td>
+                <td>0.37</td>
+                <td>0.23</td>
+                <td>0.42</td>
+                <td>0.34</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="callout info">
+        <div class="callout-title">Model Selection Rationale: MobileNetV2</div>
+        While AlexNet demonstrated marginally higher raw benchmark accuracy (0.84 vs 0.82), the pre-trained weights in the original repository were stored as Git LFS pointer stubs. MobileNetV2 provided a fully verified, intact 11.5 MB binary with identical macro F1 precision (0.82) and 10x smaller parameter complexity, making it the ideal production selection for real-time web deployment.
+    </div>
+
+    <!-- ==================== SECTION 7: QUALITY CLASSIFICATION TAXONOMY ==================== -->
+    <h2><span class="sec-num">07</span> Freshness Taxonomy & Diagnostic Criteria</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Badge</th>
+                <th>Biological Markers</th>
+                <th>Culinary & Safety Recommendation</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Fresh</strong></td>
+                <td><span class="badge badge-fresh">Fresh</span></td>
+                <td>Intact cellular firmness, uniform pigmentation, zero superficial pitting or mold.</td>
+                <td>Prime consumption condition. Safe for raw intake or prolonged storage.</td>
+            </tr>
+            <tr>
+                <td><strong>Slightly Aged</strong></td>
+                <td><span class="badge badge-aged">Slightly Aged</span></td>
+                <td>Minor water loss, mild skin dullness, minor softening at extremities.</td>
+                <td>Safe for raw or cooked consumption. Consume within 24–48 hours.</td>
+            </tr>
+            <tr>
+                <td><strong>Stale</strong></td>
+                <td><span class="badge badge-stale">Stale</span></td>
+                <td>Pronounced dehydration, noticeable loss of aroma, wrinkled surface.</td>
+                <td>Culinary quality degraded. Best cooked, stewed, or pureed; not for raw salad.</td>
+            </tr>
+            <tr>
+                <td><strong>Spoiled</strong></td>
+                <td><span class="badge badge-spoiled">Spoiled</span></td>
+                <td>Tissue softening, early microbial colonies, off-color patches.</td>
+                <td>Unfit for human consumption. Risk of foodborne illness; discard immediately.</td>
+            </tr>
+            <tr>
+                <td><strong>Rotten</strong></td>
+                <td><span class="badge badge-rotten">Rotten</span></td>
+                <td>Advanced fungal mycotoxins, structural collapse, pungent decomposition.</td>
+                <td>Hazardous bio-waste. Discard immediately into compost or sealed waste.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- ==================== SECTION 8: NON-FUNCTIONAL REQUIREMENTS ==================== -->
+    <h2><span class="sec-num">08</span> Non-Functional Requirements (NFR)</h2>
+
+    <h3>8.1 Performance & Latency</h3>
+    <ul>
+        <li><strong>NFR-1.1 (Latency Budget):</strong> Total request lifecycle (upload + preprocess + inference + history write + response) shall complete in &le; 1,200 ms on standard quad-core CPU hardware.</li>
+        <li><strong>NFR-1.2 (Cold Start Time):</strong> Model loading during application boot shall not exceed 3.5 seconds.</li>
+    </ul>
+
+    <h3>8.2 Platform Reliability & I/O Isolation</h3>
+    <ul>
+        <li><strong>NFR-2.1 (Silent Keras Execution):</strong> The inference loop must avoid console terminal formatting calls to prevent Windows CRT <code>EINVAL</code> (Errno 22).</li>
+        <li><strong>NFR-2.2 (Resource Leaks):</strong> All opened PIL image descriptors and file stream pointers must be enclosed in context managers (<code>with Image.open(...)</code>) to guarantee instant handle release on Windows file systems.</li>
+        <li><strong>NFR-2.3 (Encoding Consistency):</strong> All JSON history read and write operations must be explicitly configured with <code>encoding="utf-8"</code>.</li>
+    </ul>
+
+    <h3>8.3 Accessibility & Design System Compliance</h3>
+    <ul>
+        <li><strong>NFR-3.1 (Aesthetic Standard):</strong> Strict avoidance of generic templates, artificial emoji UI icons, or illegible glassmorphism transparencies. Adherence to a clean Figma-level aesthetic featuring high contrast, custom SVG iconography, and harmonious typography.</li>
+        <li><strong>NFR-3.2 (Color Contrast):</strong> All typography must satisfy WCAG 2.1 AA minimum contrast ratios (&ge; 4.5:1 for standard text, &ge; 3:1 for large display headings).</li>
+        <li><strong>NFR-3.3 (Cross-Device Responsiveness):</strong> Full responsive fluidity from 375px mobile viewports up to 1440px desktop displays.</li>
+    </ul>
+
+    <!-- ==================== SECTION 9: RISK ANALYSIS & MITIGATION ==================== -->
+    <h2><span class="sec-num">09</span> Risk Analysis & Mitigation Matrix</h2>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 25%;">Identified Risk</th>
+                <th style="width: 15%;">Severity / Likelihood</th>
+                <th style="width: 60%;">Mitigation Strategy Implemented</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Windows I/O Errno 22</strong></td>
+                <td>High / High</td>
+                <td>Enforced <code>verbose=0</code> on <code>model.predict()</code>, suppressing Keras Progbar cursor manipulation and box-drawing character outputs to non-interactive handles.</td>
+            </tr>
+            <tr>
+                <td><strong>Non-Standard Produce Angles</strong></td>
+                <td>Medium / Medium</td>
+                <td>Training dataset incorporated comprehensive spatial augmentations (&plusmn;15&deg; rotation, 180&deg; flip, brightness variability) to maximize angle invariance.</td>
+            </tr>
+            <tr>
+                <td><strong>File Lock on History Write</strong></td>
+                <td>Medium / Low</td>
+                <td>Wrapped history file operations in try/except blocks with explicit UTF-8 encoding so minor audit log I/O glitches never prevent diagnostic result delivery.</td>
+            </tr>
+            <tr>
+                <td><strong>Unsupported File Formats</strong></td>
+                <td>Medium / Low</td>
+                <td>Multi-tiered validation checking MIME type on client side, file extensions on server side, and Pillow decoding verification with graceful error handling.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ==================== SECTION 10: PRODUCT ROADMAP ==================== -->
+    <h2><span class="sec-num">10</span> Product Roadmap & Future Milestones</h2>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 18%;">Release Phase</th>
+                <th style="width: 22%;">Timeline</th>
+                <th style="width: 60%;">Target Capabilities & Deliverables</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Phase 1 (MVP)</strong></td>
+                <td>Current Release</td>
+                <td>MobileNetV2 engine, 5-stage classification, drag-and-drop web UI, confidence charts, persistent JSON history log, and responsive design.</td>
+            </tr>
+            <tr>
+                <td><strong>Phase 2 (Streaming)</strong></td>
+                <td>Q4 2026</td>
+                <td>Live WebRTC camera feed integration for real-time continuous video classification without manual photo capture. Multi-item bounding box detection.</td>
+            </tr>
+            <tr>
+                <td><strong>Phase 3 (Edge Mobile)</strong></td>
+                <td>Q1 2027</td>
+                <td>Export model to TFLite (TensorFlow Lite) and ONNX formats for offline on-device mobile applications (iOS / Android) with zero server latency.</td>
+            </tr>
+            <tr>
+                <td><strong>Phase 4 (Enterprise)</strong></td>
+                <td>Q3 2027</td>
+                <td>Commercial grocery store dashboard, barcode/SKU association, shelf-life forecasting time-series estimation, and smart refrigerator IoT integration.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ==================== SECTION 11: SIGN-OFF & APPROVAL ==================== -->
+    <h2><span class="sec-num">11</span> Document Approval & Governance</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Stakeholder Role</th>
+                <th>Name / Organization</th>
+                <th>Sign-off Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Lead AI / ML Engineer</td>
+                <td>FreshSense Research Team</td>
+                <td>Approved</td>
+                <td>Sept 13, 2026</td>
+            </tr>
+            <tr>
+                <td>Product Design Director</td>
+                <td>UI/UX Systems Group</td>
+                <td>Approved</td>
+                <td>Sept 13, 2026</td>
+            </tr>
+            <tr>
+                <td>Software Architect</td>
+                <td>Full-Stack Infrastructure</td>
+                <td>Approved</td>
+                <td>Sept 13, 2026</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

@@ -1,0 +1,39 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments & IDE
+.env
+.venv
+env/
+venv/
+ENV/
+.idea/
+.vscode/
+
+# Streamlit session/cache
+.streamlit/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Heavy raw datasets & redundant models (>2.2 GB)
+# Note: Production model is stored in models/MobileNetV2_best_model.keras (11.5 MB)
+Food-Freshness-Detection-Using-Deep-Learning-main/Output Files/augmented_dataset/
+Food-Freshness-Detection-Using-Deep-Learning-main/Output Files/Clustering/
+Food-Freshness-Detection-Using-Deep-Learning-main/Output Files/FoodFreshnessSample/
+Food-Freshness-Detection-Using-Deep-Learning-main/Output Files/dbscan_clustered_images/
+Food-Freshness-Detection-Using-Deep-Learning-main/Output Files/Agglomerative Model Data/
+Food-Freshness-Detection-Using-Deep-Learning-main/Output Files/K Means Model Data/
+Food-Freshness-Detection-Using-Deep-Learning-main/Output Files/kmeans_saved_models/
+Food-Freshness-Detection-Using-Deep-Learning-main/Output Files/agglomerative_saved_models/
+
+# Broken Git LFS pointer from external upstream repo
+Food-Freshness-Detection-Using-Deep-Learning-main/app/AlexNet_best_model.keras
+
+# Ephemeral user uploads from local testing
+FreshSense/static/uploads/*
+!FreshSense/static/uploads/.gitkeep

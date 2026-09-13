@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshSense — AI Food Freshness Detection</title>
+    <link rel="icon" href="/static/logo.jpg" type="image/jpeg">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <!-- Top Navigation -->
+    <header class="navbar">
+        <div class="container nav-inner">
+            <a href="/" class="nav-brand">
+                <img src="/static/logo.jpg" alt="FreshSense Logo" class="nav-logo-img">
+                <span class="brand-title">FreshSense</span>
+                <span class="brand-badge">AI 2.0</span>
+            </a>
+            <nav class="nav-links">
+                <a href="#detect">Detect Freshness</a>
+                <a href="#scale">Quality Scale</a>
+                <a href="#about">Architecture</a>
+                <a href="#history">Scan History</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+        <div class="container hero-inner">
+            <div class="hero-tag">
+                <span class="pulse-dot"></span>
+                Deep Learning Vision System &bull; 82% F1 Accuracy
+            </div>
+            <h1 class="hero-title">
+                Know your food freshness.<br>
+                <span class="gradient-text">Before you taste or serve.</span>
+            </h1>
+            <p class="hero-desc">
+                Instant computer vision classification powered by MobileNetV2. Upload any fruit or vegetable photo to evaluate quality across five distinct biological degradation stages.
+            </p>
+            <div class="hero-actions">
+                <a href="#detect" class="btn btn-primary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    Analyze Food Image
+                </a>
+                <a href="#about" class="btn btn-secondary">
+                    View Architecture
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-box">
+                    <span class="stat-value">82%</span>
+                    <span class="stat-name">Validation Accuracy</span>
+                </div>
+                <div class="stat-sep"></div>
+                <div class="stat-box">
+                    <span class="stat-value">13</span>
+                    <span class="stat-name">Food Classes Covered</span>
+                </div>
+                <div class="stat-sep"></div>
+                <div class="stat-box">
+                    <span class="stat-value">5</span>
+                    <span class="stat-name">Freshness Categories</span>
+                </div>
+                <div class="stat-sep"></div>
+                <div class="stat-box">
+                    <span class="stat-value">&lt; 1s</span>
+                    <span class="stat-name">Local CPU Inference</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detection Workspace -->
+    <section id="detect" class="section section-detect">
+        <div class="container">
+            <div class="section-header text-center">
+                <div class="section-label">AI Diagnostic Workspace</div>
+                <h2 class="section-title">Upload Food for Freshness Analysis</h2>
+                <p class="section-subtitle">Supports photos of apples, bananas, tomatoes, carrots, mangoes, cucumbers, and more.</p>
+            </div>
+
+            <div class="detect-container">
+                <!-- Upload Dropzone -->
+                <div class="dropzone-card" id="uploadZone">
+                    <div class="dropzone-body" id="uploadContent">
+                        <div class="dropzone-icon-circle">
+                            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                        </div>
+                        <h3 class="dropzone-title">Drag & drop your food image here</h3>
+                        <p class="dropzone-instruction">or click to <span class="highlight-link">browse from your computer</span></p>
+                        <div class="dropzone-badges">
+                            <span class="file-chip">JPG</span>
+                            <span class="file-chip">JPEG</span>
+                            <span class="file-chip">PNG</span>
+                            <span class="file-chip">WEBP</span>
+                        </div>
+                    </div>
+
+                    <!-- Image Preview View -->
+                    <div class="preview-wrapper" id="uploadPreview" style="display:none;">
+                        <img id="previewImage" alt="Food scan preview" class="preview-img">
+                        <button class="remove-btn" id="removeImage" title="Remove current image" aria-label="Remove image">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                    </div>
+                    <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp" hidden>
+                </div>
+
+                <!-- Analysis Outcome -->
+                <div class="result-card-container">
+                    <!-- Idle State -->
+                    <div class="state-placeholder" id="resultEmpty">
+                        <div class="placeholder-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 14 14"></polyline>
+                            </svg>
+                        </div>
+                        <h4>Awaiting Input Image</h4>
+                        <p>Upload a food photo on the left. The neural network will extract features, classify freshness, and calculate confidence distribution in real-time.</p>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div class="state-loading" id="resultLoading" style="display:none;">
+                        <div class="loader-spinner"></div>
+                        <h4>Evaluating Quality Features...</h4>
+                        <p>Preprocessing image &bull; Running MobileNetV2 inference</p>
+                    </div>
+
+                    <!-- Complete State -->
+                    <div class="state-result" id="resultCard" style="display:none;">
+                        <div class="result-headline">
+                            <div class="badge-wrapper">
+                                <span class="result-tag" id="resultBadge">Fresh</span>
+                            </div>
+                            <span class="confidence-indicator" id="resultConfidence">94.6% Confidence</span>
+                        </div>
+
+                        <p class="result-summary" id="resultDescription">
+                            This item is optimal for consumption with preserved firmness and color.
+                        </p>
+
+                        <div class="probability-section">
+                            <div class="prob-title">Confidence Distribution Across 5 Classes</div>
+                            <div class="chart-bars" id="probChart"></div>
+                        </div>
+
+                        <button class="btn btn-reset" id="analyzeAnother">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                            Analyze Another Item
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5-Level Freshness Scale -->
+    <section id="scale" class="section section-scale">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-label">Classification Taxonomy</div>
+                <h2 class="section-title">The 5-Stage Freshness Spectrum</h2>
+                <p class="section-subtitle">Our Agglomerative clustering pipeline groups images into five visually distinctive stages of deterioration.</p>
+            </div>
+
+            <div class="scale-grid">
+                <div class="scale-card scale-c1">
+                    <div class="scale-card-header">
+                        <span class="scale-number">01</span>
+                        <span class="scale-status">Fresh</span>
+                    </div>
+                    <div class="scale-indicator"></div>
+                    <p class="scale-desc">Harvest-grade quality, vibrant skin pigmentation, crisp texture, and zero noticeable biological degradation.</p>
+                </div>
+                <div class="scale-card scale-c2">
+                    <div class="scale-card-header">
+                        <span class="scale-number">02</span>
+                        <span class="scale-status">Slightly Aged</span>
+                    </div>
+                    <div class="scale-indicator"></div>
+                    <p class="scale-desc">Early oxidation or minor moisture depletion. Completely safe to consume; recommended for near-term preparation.</p>
+                </div>
+                <div class="scale-card scale-c3">
+                    <div class="scale-card-header">
+                        <span class="scale-number">03</span>
+                        <span class="scale-status">Stale</span>
+                    </div>
+                    <div class="scale-indicator"></div>
+                    <p class="scale-desc">Noticeable dehydration, softened cellular structure, or loss of aroma. Significant decline in culinary quality.</p>
+                </div>
+                <div class="scale-card scale-c4">
+                    <div class="scale-card-header">
+                        <span class="scale-number">04</span>
+                        <span class="scale-status">Spoiled</span>
+                    </div>
+                    <div class="scale-indicator"></div>
+                    <p class="scale-desc">Discoloration, surface softening, and onset of mold or bacterial presence. Not recommended for human intake.</p>
+                </div>
+                <div class="scale-card scale-c5">
+                    <div class="scale-card-header">
+                        <span class="scale-number">05</span>
+                        <span class="scale-status">Rotten</span>
+                    </div>
+                    <div class="scale-indicator"></div>
+                    <p class="scale-desc">Advanced microbial degradation, severe fungal growth, structural breakdown. Discard immediately to protect surroundings.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture & Tech Stack -->
+    <section id="about" class="section section-about">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-label">Engineering & Tech Stack</div>
+                <h2 class="section-title">Built on Computer Vision Research</h2>
+                <p class="section-subtitle">Trained on thousands of curated fruit and vegetable images across 13 diverse species.</p>
+            </div>
+
+            <div class="cards-bento">
+                <div class="bento-card bento-emerald">
+                    <div class="bento-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    </div>
+                    <h3>MobileNetV2 Neural Network</h3>
+                    <p>Features inverted residual bottlenecks and depthwise separable convolutions to achieve high accuracy with minimal parameter overhead.</p>
+                    <div class="bento-footer">Agglomerative weights &bull; 82% accuracy</div>
+                </div>
+
+                <div class="bento-card bento-amber">
+                    <div class="bento-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    </div>
+                    <h3>Keras 3 NumPy Engine</h3>
+                    <p>Silent CPU inference powered by Keras 3 with NumPy/JAX math primitives. No GPU dependencies or heavy CUDA setup needed.</p>
+                    <div class="bento-footer">Zero-latency backend pipeline</div>
+                </div>
+
+                <div class="bento-card bento-rose">
+                    <div class="bento-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+                    </div>
+                    <h3>13 Produce Categories</h3>
+                    <p>Trained on Apple, Banana, Bell Pepper, Bitter Gourd, Capsicum, Carrot, Cucumber, Mango, Okra, Orange, Potato, Strawberry, and Tomato.</p>
+                    <div class="bento-footer">6.4 GB curated dataset</div>
+                </div>
+
+                <div class="bento-card bento-indigo">
+                    <div class="bento-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+                    </div>
+                    <h3>Flask Microservices</h3>
+                    <p>RESTful JSON endpoints handling multipart image streaming, image normalization (128&times;128), and transaction history persistence.</p>
+                    <div class="bento-footer">Production-grade Python 3.14 API</div>
+                </div>
+
+                <div class="bento-card bento-cyan">
+                    <div class="bento-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    </div>
+                    <h3>Computer Vision Preprocessing</h3>
+                    <p>Gaussian blur noise reduction, Canny edge detection, and histogram normalization at 128&times;128 resolution for consistent inference.</p>
+                    <div class="bento-footer">Robust invariant transforms</div>
+                </div>
+
+                <div class="bento-card bento-purple">
+                    <div class="bento-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+                    </div>
+                    <h3>Agglomerative Cluster Hierarchy</h3>
+                    <p>Euclidean metric with Ward linkage grouping to discover non-linear quality degradation boundaries without manual annotation bias.</p>
+                    <div class="bento-footer">Unsupervised quality discovery</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scan History Section -->
+    <section id="history" class="section section-history">
+        <div class="container">
+            <div class="history-topbar">
+                <div>
+                    <div class="section-label">Audit Log</div>
+                    <h2 class="section-title">Diagnostic History</h2>
+                    <p class="section-subtitle">Review recent food classification records and confidence metrics.</p>
+                </div>
+                <button class="btn btn-danger-outline" id="clearHistory" style="display:none;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    Clear All Records
+                </button>
+            </div>
+
+            <!-- Empty History State -->
+            <div class="history-empty-box" id="historyEmpty">
+                <div class="empty-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                </div>
+                <h4>No previous scan records</h4>
+                <p>Upload a food picture in the workspace above to generate your first freshness record.</p>
+            </div>
+
+            <!-- Populated History Grid -->
+            <div class="history-card-grid" id="historyGrid"></div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="footer-left">
+                <img src="/static/logo.jpg" alt="FreshSense" class="footer-logo">
+                <div>
+                    <div class="footer-brand-name">FreshSense</div>
+                    <div class="footer-sub">Deep Learning Food Spoilage Diagnostic Platform</div>
+                </div>
+            </div>
+            <div class="footer-right">
+                <span>MobileNetV2</span> &bull; 
+                <span>Keras 3</span> &bull; 
+                <span>Flask</span> &bull; 
+                <span>Agglomerative Clustering</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
