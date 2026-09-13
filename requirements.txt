@@ -1,9 +1,8 @@
-# FreshSense — Python Dependencies (Flask & Streamlit Cloud)
+# FreshSense — Production Dependencies (Flask & Streamlit Cloud)
 streamlit>=1.30.0
-flask>=3.0.0
 keras>=3.0.0
 numpy>=1.26.0
 pillow>=10.0.0
-scipy>=1.15.0
-jax>=0.4.0
-jaxlib>=0.4.0
+scipy>=1.12.0
+flask>=3.0.0
+tensorflow-cpu>=2.15.0; python_version < "3.13"
