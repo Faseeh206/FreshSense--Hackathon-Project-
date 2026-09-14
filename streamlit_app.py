@@ -146,7 +146,7 @@ def load_model():
             "Could not locate MobileNetV2_best_model.keras in any candidate path: "
             + ", ".join(candidate_paths)
         )
-    return keras.saving.load_model(model_path)
+    return keras.saving.load_model(model_path, compile=False)
 
 try:
     model = load_model()
