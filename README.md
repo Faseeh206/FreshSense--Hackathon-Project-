@@ -210,10 +210,9 @@ FreshSense (Hackathon Project)/
 
 ## 📑 Project Deliverables
 
-* **Interactive Web App:** `http://127.0.0.1:5000`
-* **Interactive Presentation Slides:** `http://127.0.0.1:5000/presentation`
-* **PRD Document (PDF):** [`FreshSense_PRD.pdf`](FreshSense_PRD.pdf) *(Includes official Hackathon title page)*
-* **Slide Deck (PDF):** [`FreshSense_Presentation.pdf`](FreshSense_Presentation.pdf) *(16:9 Widescreen slide format)*
+* **Interactive Web App:** `https://freshsense.streamlit.app/`
+* **PRD Document (PDF):** `https://drive.google.com/file/d/126NQUl5jqrHkIzjDw4q5sg6FE6Xdu2ku/view?usp=drive_link`
+* **Slide Deck (PDF):** `https://drive.google.com/file/d/16gK0noxDvcbig9dNapyqFg5QszlczprF/view?usp=drive_link`
 
 ---
 
